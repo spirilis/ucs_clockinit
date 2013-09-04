@@ -19,7 +19,14 @@ uint8_t ucs_clockinit(unsigned long freq, uint8_t use_xt1, uint8_t vlo_as_aclk)
 		UCSCTL4 = (UCSCTL4 & ~SELA_7) | SELA__VLOCLK;
 
 	if (use_xt1) {
+
+		#ifdef __MSP430F5172
 		PJSEL |= BIT4|BIT5;
+		#endif
+		#ifdef __MSP430F5529
+		P5SEL |= BIT4|BIT5;
+		#endif
+
 		UCSCTL6 &= ~XT1OFF;
 		UCSCTL6 = (UCSCTL6 & ~(XCAP_3|XT1DRIVE_3)) | XCAP_0 | XT1DRIVE_3;
 		if (!vlo_as_aclk)
@@ -33,7 +40,11 @@ uint8_t ucs_clockinit(unsigned long freq, uint8_t use_xt1, uint8_t vlo_as_aclk)
 			return 0;  // XT1 FAILED
 	} else {
 		UCSCTL6 |= XT1OFF;
+		#ifdef XT1HFOFFG
 		UCSCTL7 &= ~(XT1LFOFFG | XT1HFOFFG);
+		#else
+		UCSCTL7 &= ~XT1LFOFFG;
+		#endif
 		UCSCTL3 = SELREF__REFOCLK;
 	}
 
@@ -61,7 +72,11 @@ uint8_t ucs_clockinit(unsigned long freq, uint8_t use_xt1, uint8_t vlo_as_aclk)
 
 	// Loop until XT1 & DCO fault flags have cleared
 	do {
+		#ifdef XT1HFOFFG
 		UCSCTL7 &= ~(XT1LFOFFG | XT1HFOFFG | DCOFFG);
+		#else
+		UCSCTL7 &= ~(XT1LFOFFG | DCOFFG);
+		#endif
 		SFRIFG1 &= ~OFIFG;
 	} while (SFRIFG1 & OFIFG);
 
