@@ -38,6 +38,7 @@ uint8_t ucs_clockinit(unsigned long freq, uint8_t use_xt1, uint8_t vlo_as_aclk)
 		} while (UCSCTL7 & XT1LFOFFG && attempts < 1000000);
 		if (attempts == 1000000)
 			return 0;  // XT1 FAILED
+		UCSCTL3 = SELREF__XT1CLK;
 	} else {
 		UCSCTL6 |= XT1OFF;
 		#ifdef XT1HFOFFG
