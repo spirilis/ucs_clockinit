@@ -40,6 +40,8 @@ uint16_t ucs_clockinit(unsigned long freq, uint16_t use_xt1, uint16_t vlo_as_acl
 			return 0;  // XT1 FAILED
 		UCSCTL3 = SELREF__XT1CLK;
 	} else {
+		if (!vlo_as_aclk)
+			UCSCTL4 = (UCSCTL4 & ~SELA_7) | SELA__REFOCLK;
 		UCSCTL6 |= XT1OFF;
 		#ifdef XT1HFOFFG
 		UCSCTL7 &= ~(XT1LFOFFG | XT1HFOFFG);
